@@ -196,6 +196,15 @@ class TestDarp(unittest.TestCase):
     darp.prep(f).run('cmd.py --dry-run'.split())
     self.assertTrue(self.ran)
     
+  def test_unknown_shortcut(self):
+    def f(apple=False):
+      self.ran = True
+    darp.prep(f, a='apple').run('cmd.py -ab'.split())
+    self.assertEquals(self.get_stderr(),[
+      "f() unknown argument: -b",
+      'usage: python3 cmd.py [-a|--apple <value>]'
+    ])
+    self.assertFalse(self.ran)
     
     
 if __name__ == '__main__':

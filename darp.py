@@ -1,6 +1,6 @@
 import inspect, os, subprocess, sys, traceback
 
-__version__ = '1.1'
+__version__ = '1.2'
 
 REQUIRED = object()
 
@@ -9,6 +9,7 @@ class prep:
     self.f = f
     self.sig = inspect.signature(self.f)
     self.shortcuts = shortcuts
+    self.r_shortcuts = dict([(v,k) for k,v in shortcuts.items()])
     
   def _gen_doc(self, args):
     interpretor = sys.executable
@@ -24,7 +25,7 @@ class prep:
     if param.default==REQUIRED:
       return '--%s <%s>' % (name, kind or 'value')
     if param.default!=param.empty:
-      return '[--%s <%s>]' % (name, kind or 'value')
+      return '[%s--%s <%s>]' % ('-%s|' % self.r_shortcuts[name] if name in self.r_shortcuts else '', name, kind or 'value')
     if kind:
       return '<%s:%s>' % (name, kind)
     else:
@@ -42,9 +43,15 @@ class prep:
         arg = arg.replace('-','_')
         kwarg = arg[2:]
       elif arg.startswith('-') and len(arg)>1:
-        for char in arg[1:-1]:
+        for char in arg[1:]:
+          if char not in self.shortcuts:
+            if self.f.__doc__:
+              print(self.f.__doc__, file=sys.stderr)
+            print('%s() unknown argument: -%s' % (self.f.__name__, char), file=sys.stderr)
+            print(self._gen_doc(cl_args), file=sys.stderr)
+            return
+          kwarg = self.shortcuts[char]
           kwargs[self.shortcuts[char]] = True
-        kwarg = self.shortcuts[arg[-1]]
       else:
         if kwarg:
           kwargs[kwarg] = arg
@@ -77,8 +84,7 @@ class prep:
       if param.default==REQUIRED and param.name not in kwargs:
         missing_kwargs.append(param.name)
     if missing_kwargs:
-      r_shortcuts = dict([(v,k) for k,v in self.shortcuts.items()])
-      arg_desc_list = ["'%s--%s'" % ('-%s|' % r_shortcuts[s] if s in r_shortcuts else '', s) for s in missing_kwargs]
+      arg_desc_list = ["'%s--%s'" % ('-%s|' % self.r_shortcuts[s] if s in self.r_shortcuts else '', s) for s in missing_kwargs]
       if len(arg_desc_list) > 2:
         arg_desc_list[-1] = 'and %s' % arg_desc_list[-1]
         arg_desc = ', '.join(arg_desc_list)
@@ -92,7 +98,7 @@ class prep:
 
     #print('calling', self.f, args, kwargs)
     try:
-      self.f(*args, **kwargs)
+      return self.f(*args, **kwargs)
     except TypeError as e:
       if self.f.__doc__:
         print(self.f.__doc__, file=sys.stderr)
