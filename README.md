@@ -1,6 +1,8 @@
 Derek's Argument Parser
 =======================
 
+[![Build Status](https://travis-ci.org/keredson/darp.svg?branch=master)](https://travis-ci.org/keredson/darp)
+
 This is a Pythonic argument parser.  It automatically converts your sys.argv to `*args, **kwargs` and passes them to whatever function you wish.  It also automatically generates usage messages and handles python type checking / conversions.
 
 For example, if you have the following program:
