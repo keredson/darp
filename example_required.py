@@ -9,7 +9,7 @@ import darp
 # usage: python3 example.py <name> [--port <int>]
 
 
-def serve(name, port:int=8888):
+def serve(name, port:int=darp.REQUIRED):
   '''Example DArP (Derek's Argument Parser) app...'''
   print('running', name, 'on', port)
   

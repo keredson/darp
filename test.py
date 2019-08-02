@@ -159,6 +159,43 @@ class TestDarp(unittest.TestCase):
     ])
     self.assertFalse(self.ran)
     
+  def test_exists_arg(self):
+    def f(a=False):
+      self.assertEquals(a,True)
+      self.ran = True
+    darp.prep(f).run('cmd.py --a'.split())
+    self.assertTrue(self.ran)
+    
+  def test_shortcut_exists_arg(self):
+    def f(apple=False):
+      self.assertEquals(apple,True)
+      self.ran = True
+    darp.prep(f, a='apple').run('cmd.py -a'.split())
+    self.assertTrue(self.ran)
+    
+  def test_multiple_shortcut_exists_arg(self):
+    def f(apple=False, banana=False):
+      self.assertEquals(apple,True)
+      self.assertEquals(banana,True)
+      self.ran = True
+    darp.prep(f, a='apple', b='banana').run('cmd.py -a -b'.split())
+    self.assertTrue(self.ran)
+    
+  def test_squashed_shortcut_exists_arg(self):
+    def f(apple=False, banana=False):
+      self.assertEquals(apple,True)
+      self.assertEquals(banana,True)
+      self.ran = True
+    darp.prep(f, a='apple', b='banana').run('cmd.py -ab'.split())
+    self.assertTrue(self.ran)
+    
+  def test_two_word_arg(self):
+    def f(dry_run=False):
+      self.assertEquals(dry_run,True)
+      self.ran = True
+    darp.prep(f).run('cmd.py --dry-run'.split())
+    self.assertTrue(self.ran)
+    
     
     
 if __name__ == '__main__':

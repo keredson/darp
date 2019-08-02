@@ -9,9 +9,11 @@ import darp
 # usage: python3 example.py <name> [--port <int>]
 
 
-def serve(name, port:int=8888):
-  '''Example DArP (Derek's Argument Parser) app...'''
-  print('running', name, 'on', port)
+def doit(dry_run=False):
+  if dry_run:
+    print('doing a dry run...')
+  else:
+    print('doing it for real!')
   
 if __name__=='__main__':
-  darp.prep(serve, p='port').run()
+  darp.prep(doit).run()

@@ -1,6 +1,6 @@
 import inspect, os, subprocess, sys, traceback
 
-__version__ = '1.0'
+__version__ = '1.1'
 
 REQUIRED = object()
 
@@ -35,10 +35,16 @@ class prep:
     kwargs = {}
     kwarg = None
     for arg in cl_args[1:]:
+      if arg.startswith('-') and kwarg:
+        kwargs[kwarg] = True
+        kwarg = None
       if arg.startswith('--'):
+        arg = arg.replace('-','_')
         kwarg = arg[2:]
-      elif arg.startswith('-'):
-        kwarg = self.shortcuts[arg[1:]]
+      elif arg.startswith('-') and len(arg)>1:
+        for char in arg[1:-1]:
+          kwargs[self.shortcuts[char]] = True
+        kwarg = self.shortcuts[arg[-1]]
       else:
         if kwarg:
           kwargs[kwarg] = arg
@@ -54,6 +60,16 @@ class prep:
       param = self.sig.parameters.get(k)
       if param and param.annotation!=param.empty:
         kwargs[k] = param.annotation(v)
+    
+    if kwarg:
+      kwargs[kwarg] = True
+
+    # handle --help        
+    if not args and kwargs=={'help':True}:
+      if self.f.__doc__:
+        print(self.f.__doc__, file=sys.stderr)
+      print(self._gen_doc(cl_args), file=sys.stderr)
+      return
         
     # check for required kwargs
     missing_kwargs = []
