@@ -100,4 +100,9 @@ apple True
 banana True
 ```
 
+How to Install
+--------------
 
+```bash
+$ pip3 install darp
+```
