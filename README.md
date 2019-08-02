@@ -57,3 +57,47 @@ Example:
 $ python3 example.py server -p 7777
 running server on 7777
 ```
+
+Existence Parameters
+--------------------
+Keyword parameters without values are considered `True` if present.  For example:
+
+```python
+def doit(dry_run=False):
+  if dry_run:
+    print('doing a dry run...')
+  else:
+    print('doing it for real!')
+  
+if __name__=='__main__':
+  darp.prep(doit).run()
+```
+
+Example run:
+```
+$ python3 example_existence.py --dry-run
+doing a dry run...
+```
+
+Notice that `--dry-run` is mapped to the `dry_run` kwarg.
+
+Existence params can be combined if using shortcuts.  See:
+
+```python
+def doit(apple=False, banana=False):
+  print('apple', apple)
+  print('banana', banana)
+  
+if __name__=='__main__':
+  darp.prep(doit, a='apple', b='banana').run()
+```
+
+Example run:
+
+```
+$ python3 example_squashed_existence.py -ab
+apple True
+banana True
+```
+
+
