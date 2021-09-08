@@ -48,8 +48,10 @@ class prep:
         kwargs[kwarg] = True
         kwarg = None
       if arg.startswith('--'):
-        arg = arg.replace('-','_')
-        kwarg = arg[2:]
+        kwarg = arg.replace('-','_')[2:]
+        if '=' in kwarg:
+          kwargs[kwarg.split('=')[0]] = kwarg.split('=')[1]
+          kwarg = None
       elif arg.startswith('-') and len(arg)>1:
         for char in arg[1:]:
           if char not in self.shortcuts:

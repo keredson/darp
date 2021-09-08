@@ -44,6 +44,13 @@ class TestDarp(unittest.TestCase):
     darp.prep(f).run('cmd.py --a 1'.split())
     self.assertTrue(self.ran)
     
+  def test_kwarg_with_eq(self):
+    def f(a=None):
+      self.assertEquals(a,'b')
+      self.ran = True
+    darp.prep(f).run('cmd.py --a=b'.split())
+    self.assertTrue(self.ran)
+    
   def test_arg_and_kwarg(self):
     def f(a, b=None):
       self.assertEquals(a,'a')
@@ -73,7 +80,7 @@ class TestDarp(unittest.TestCase):
     darp.prep(f).run('cmd.py'.split())
     self.assertEquals(self.get_stderr(),[
       "f() missing 1 required positional argument: 'a'",
-      'usage: python3 cmd.py <a>'
+      'usage: python cmd.py <a>'
     ])
     self.assertFalse(self.ran)
     
@@ -83,7 +90,7 @@ class TestDarp(unittest.TestCase):
     darp.prep(f).run('cmd.py'.split())
     self.assertEquals(self.get_stderr(),[
       "f() missing 2 required positional arguments: 'a' and 'b'",
-      'usage: python3 cmd.py <a> <b>'
+      'usage: python cmd.py <a> <b>'
     ])
     self.assertFalse(self.ran)
     
@@ -93,7 +100,7 @@ class TestDarp(unittest.TestCase):
     darp.prep(f).run('cmd.py'.split())
     self.assertEquals(self.get_stderr(),[
       "f() missing 3 required positional arguments: 'a', 'b', and 'c'",
-      'usage: python3 cmd.py <a> <b> <c>'
+      'usage: python cmd.py <a> <b> <c>'
     ])
     self.assertFalse(self.ran)
     
@@ -103,7 +110,7 @@ class TestDarp(unittest.TestCase):
     darp.prep(f).run('cmd.py'.split())
     self.assertEquals(self.get_stderr(),[
       "f() missing 1 required positional argument: 'a'",
-      'usage: python3 cmd.py <a:int>'
+      'usage: python cmd.py <a:int>'
     ])
     self.assertFalse(self.ran)
 
@@ -114,7 +121,7 @@ class TestDarp(unittest.TestCase):
     self.assertFalse(self.ran)
     self.assertEquals(self.get_stderr(),[
       "f() missing 1 required argument: '--a'",
-      'usage: python3 cmd.py --a <value>'
+      'usage: python cmd.py --a <value>'
     ])
     
   def test_two_missing_kwargs(self):
@@ -124,7 +131,7 @@ class TestDarp(unittest.TestCase):
     self.assertFalse(self.ran)
     self.assertEquals(self.get_stderr(),[
       "f() missing 2 required arguments: '--a' and '--b'",
-      'usage: python3 cmd.py --a <value> --b <value>'
+      'usage: python cmd.py --a <value> --b <value>'
     ])
     
   def test_three_missing_kwargs(self):
@@ -134,7 +141,7 @@ class TestDarp(unittest.TestCase):
     self.assertFalse(self.ran)
     self.assertEquals(self.get_stderr(),[
       "f() missing 3 required arguments: '--a', '--b', and '--c'",
-      'usage: python3 cmd.py --a <value> --b <value> --c <value>'
+      'usage: python cmd.py --a <value> --b <value> --c <value>'
     ])
     
   def test_missing_kwarg_with_shortcut(self):
@@ -144,7 +151,7 @@ class TestDarp(unittest.TestCase):
     self.assertFalse(self.ran)
     self.assertEquals(self.get_stderr(),[
       "f() missing 1 required argument: '-a|--apple'",
-      'usage: python3 cmd.py --apple <value>'
+      'usage: python cmd.py --apple <value>'
     ])
 
   def test_docstring(self):
@@ -155,7 +162,7 @@ class TestDarp(unittest.TestCase):
     self.assertEquals(self.get_stderr(),[
       "This is tool F!",
       "f() missing 1 required positional argument: 'a'",
-      'usage: python3 cmd.py <a>'
+      'usage: python cmd.py <a>'
     ])
     self.assertFalse(self.ran)
     
@@ -202,10 +209,21 @@ class TestDarp(unittest.TestCase):
     darp.prep(f, a='apple').run('cmd.py -ab'.split())
     self.assertEquals(self.get_stderr(),[
       "f() unknown argument: -b",
-      'usage: python3 cmd.py [-a|--apple <value>]'
+      'usage: python cmd.py [-a|--apple <value>]'
+    ])
+    self.assertFalse(self.ran)
+
+  def test_help(self):
+    def f(dry_run=False):
+      self.assertEquals(dry_run,True)
+      self.ran = True
+    darp.prep(f).run('cmd.py --help'.split())
+    self.assertEquals(self.get_stderr(),[
+      'usage: python cmd.py [--dry_run <value>]'
     ])
     self.assertFalse(self.ran)
     
+
     
 if __name__ == '__main__':
   unittest.main()
