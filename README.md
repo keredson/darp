@@ -102,6 +102,14 @@ apple True
 banana True
 ```
 
+Equals in Arguments
+-------------------
+These are equivalent:
+```
+$ python3 example.py --port 7777
+$ python3 example.py --port=7777
+```
+
 How to Install
 --------------
 
