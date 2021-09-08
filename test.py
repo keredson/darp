@@ -223,6 +223,34 @@ class TestDarp(unittest.TestCase):
     ])
     self.assertFalse(self.ran)
     
+  def test_alt_shortcut(self):
+    def f(apple='apple' + darp.alt('a')):
+      self.assertEquals(apple,'banana')
+      self.ran = True
+    darp.prep(f).run('cmd.py -a banana'.split())
+    self.assertTrue(self.ran)
+
+  def test_alt_two_shortcuts(self):
+    def f(apple='apple' + darp.alt('a') + darp.alt('b')):
+      self.assertEquals(apple,'banana')
+      self.ran = True
+    darp.prep(f).run('cmd.py -b banana'.split())
+    self.assertTrue(self.ran)
+
+  def test_alt_shortcut_default(self):
+    def f(apple='apple' + darp.alt('a')):
+      self.assertEquals(apple,'apple')
+      self.ran = True
+    darp.prep(f).run('cmd.py'.split())
+    self.assertTrue(self.ran)
+
+  def test_alt_shortcut_default_two_shortcuts(self):
+    def f(apple='apple' + darp.alt('a') + darp.alt('b')):
+      self.assertEquals(apple,'apple')
+      self.ran = True
+    darp.prep(f).run('cmd.py'.split())
+    self.assertTrue(self.ran)
+
 
     
 if __name__ == '__main__':

@@ -16,8 +16,18 @@ class prep:
   def __init__(self, f, **shortcuts):
     self.f = f
     self.sig = inspect.signature(self.f)
+    self.actual_defaults = {}
     self.shortcuts = shortcuts
+    for param in self.sig.parameters.values():
+      self._find_alts_and_hints(param)
     self.r_shortcuts = dict([(v,k) for k,v in shortcuts.items()])
+
+  def _find_alts_and_hints(self, param):
+    default = param.default
+    while isinstance(default, alt):
+      self.shortcuts[default.c] = param.name
+      self.actual_defaults[param.name] = default.default
+      default = default.default
     
   def _gen_doc(self, args):
     interpretor = sys.executable
@@ -41,7 +51,7 @@ class prep:
     
   def run(self, cl_args=sys.argv):
     args = []
-    kwargs = {}
+    kwargs = self.actual_defaults.copy()
     kwarg = None
     for arg in cl_args[1:]:
       if arg.startswith('-') and kwarg:
@@ -129,3 +139,17 @@ class prep:
   
   
     
+class alt:
+  def __init__(self, c:str, default=None):
+    if len(c)!=1: raise Exception('alts must be a single character:', c)
+    self.c = c
+    self.default = default
+
+  def __add__(self, o):
+    return alt(o.c, default=self)
+
+  def __radd__(self, o):
+    return alt(self.c, default=o)
+
+  def __repr__(self) -> str:
+      return '<alt c=%s default=%s>' % (self.c, repr(self.default))
