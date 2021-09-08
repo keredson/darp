@@ -47,12 +47,20 @@ usage: python3 example_required.py <name> --port <int>
 
 Shortcut Parameters
 -------------------
-Keyword parameters are prefixed with `--` (like `--port`).  A shortcut parameter is when you want your script to respond to `-p 7777` as if the user typed `--port 7777`.  You specify this relationship via arguments to `darp.prep` like:
+Keyword parameters are prefixed with `--` (like `--port`).  A shortcut parameter is when you want your script to respond to `-p 7777` as if the user typed `--port 7777`.  You specify this relationship via keyword arguments to `darp.prep()`, like:
 
 ```python
 if __name__=='__main__':
   darp.prep(serve, p='port').run()
 ```
+
+Or by additions to the defaults for a function, like:
+```python
+def serve(name, port:int=8888+darp.alt('p')):
+  print('running', name, 'on', port)
+```
+
+Both are equivalent.  The latter takes precedence.
 
 Example:
 ```
