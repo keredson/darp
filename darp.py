@@ -1,8 +1,16 @@
-import inspect, os, subprocess, sys, traceback
+import inspect, os, subprocess, sys, traceback, types
 
 __version__ = '1.2'
 
 REQUIRED = object()
+
+TYPE_MAP = {
+  'list': list,
+  'set': set,
+  'int': int,
+  'float': float,
+  'str': str,
+}
 
 class prep:
   def __init__(self, f, **shortcuts):
@@ -66,7 +74,18 @@ class prep:
     for k,v in list(kwargs.items()):
       param = self.sig.parameters.get(k)
       if param and param.annotation!=param.empty:
-        kwargs[k] = param.annotation(v)
+        if param.annotation == list:
+          kwargs[k] = v.split(',')
+        elif isinstance(param.annotation, types.GenericAlias):
+          t1 = str(param.annotation).split('[')[0]
+          t2 = str(param.annotation).split('[')[1].strip(']')
+          if t1 in TYPE_MAP: t1 = TYPE_MAP[t1]
+          else: raise Exception('unknown GenericAlias type', t1)
+          if t2 in TYPE_MAP: t2 = TYPE_MAP[t2]
+          else: raise Exception('unknown GenericAlias subtype', t2)
+          kwargs[k] = t1([t2(x) for x in v.split(',')])
+        else:
+          kwargs[k] = param.annotation(v)
     
     if kwarg:
       kwargs[kwarg] = True
