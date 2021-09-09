@@ -1,6 +1,6 @@
 import inspect, os, subprocess, sys, traceback, types
 
-__version__ = '1.2'
+__version__ = '1.3.1'
 
 REQUIRED = object()
 
