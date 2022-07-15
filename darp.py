@@ -1,6 +1,6 @@
 import inspect, os, subprocess, sys, traceback, types
 
-__version__ = '1.3.1'
+__version__ = '1.3.2'
 
 REQUIRED = object()
 
@@ -88,7 +88,7 @@ class prep:
       if param and param.annotation!=param.empty:
         if param.annotation == list:
           kwargs[k] = v.split(',')
-        elif isinstance(param.annotation, types.GenericAlias):
+        elif hasattr(types, 'GenericAlias') and isinstance(param.annotation, types.GenericAlias):
           t1 = str(param.annotation).split('[')[0]
           t2 = str(param.annotation).split('[')[1].strip(']')
           if t1 in TYPE_MAP: t1 = TYPE_MAP[t1]
